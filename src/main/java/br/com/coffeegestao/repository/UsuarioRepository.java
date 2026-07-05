@@ -40,4 +40,33 @@ public class UsuarioRepository {
             throw new RuntimeException("Erro ao salvar usuário no banco de dados.", e);
         }
     }
+
+    public Optional<Usuario> buscarPorEmail(String email) {
+        String sql = """
+                SELECT id, nome, email, senha, perfil, ativo
+                FROM usuarios
+                WHERE email = ?
+                LIMIT 1;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+            PreparedStatement  stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Usuario usuario = new Usuario(rs);
+                    return Optional.of(usuario);
+                }
+            }
+
+            return Optional.empty();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar usuário por email.", e);
+        }
+    }
+
+
 }
