@@ -68,5 +68,27 @@ public class UsuarioRepository {
         }
     }
 
+    public boolean existeAdmin() {
+        String sql = """
+                SELECT COUNT(*) AS total 
+                FROM usuarios
+                WHERE perfil = 'ADMIN';
+                """;
 
-}
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("total") > 0;
+
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao verificar a existência de usuário admin", e);
+            }
+        }
+
+    }
