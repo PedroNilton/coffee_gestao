@@ -3,10 +3,7 @@ package br.com.coffeegestao.repository;
 import br.com.coffeegestao.database.ConnectionFactory;
 import br.com.coffeegestao.model.Usuario;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Optional;
 
 public class UsuarioRepository {
@@ -89,6 +86,17 @@ public class UsuarioRepository {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao verificar a existência de usuário admin", e);
             }
+        }
+
+        public Usuario mapearUsuario(ResultSet rs) throws SQLException {
+            return new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("email"),
+                    rs.getString("senha"),
+                    rs.getString("perfil"),
+                    rs.getInt("ativo") == 1
+            );
         }
 
     }
