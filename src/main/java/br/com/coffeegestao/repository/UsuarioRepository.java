@@ -3,7 +3,11 @@ package br.com.coffeegestao.repository;
 import br.com.coffeegestao.database.ConnectionFactory;
 import br.com.coffeegestao.model.Usuario;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 
 public class UsuarioRepository {
@@ -15,7 +19,7 @@ public class UsuarioRepository {
                 """;
 
         try (Connection conn = ConnectionFactory.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, usuario.getNome());
             stmt.setString(2, usuario.getEmail());
@@ -88,7 +92,7 @@ public class UsuarioRepository {
             }
         }
 
-        public Usuario mapearUsuario(ResultSet rs) throws SQLException {
+        private Usuario mapearUsuario(ResultSet rs) throws SQLException {
             return new Usuario(
                     rs.getInt("id"),
                     rs.getString("nome"),
