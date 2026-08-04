@@ -1,80 +1,54 @@
-package br.com.coffeegestao.service;
+package br.com.coffeegestao.repository;
 
+import br.com.coffeegestao.database.ConnectionFactory;
 import br.com.coffeegestao.model.OrdemServico;
 import br.com.coffeegestao.model.StatusOrdemServico;
-import br.com.coffeegestao.repository.OrdemServicoRepository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-public class OrdemServicoService {
+public class OrdemServicoRepository {
 
-    private final OrdemServicoRepository repository;
+    public OrdemServico salvar(OrdemServico ordem) {
+        String sql = """
+                INSERT INTO ordens_servico
+                    (cliente_id, aparelho_id, defeito_relatado, diagnostico, solucao,
+                     status, valor_servico, data_abertura, data_fechamento)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                """;
 
-    public OrdemServicoService(OrdemServicoRepository repository) {
-        this.repository = repository;
-    }
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-    public OrdemServico abrir(int clienteId, int aparelhoId, String defeitoRelatado) {
-        if (defeitoRelatado == null || defeitoRelatado.isBlank()) {
-            throw new IllegalArgumentException("Descreva o defeito relatado pelo cliente.");
+            stmt.setInt(1, ordem.getClienteId());
+            stmt.setInt(2, ordem.getAparelhoId());
+            stmt.setString(3, ordem.getDefeitoRelatado());
+            stmt.setString(4, ordem.getDiagnostico());
+            stmt.setString(5, ordem.getSolucao());
+            stmt.setString(6, ordem.getStatus().name());
+            stmt.setDouble(7, ordem.getValorServico());
+            stmt.setString(8, ordem.getDataAbertura().toString());
+            stmt.setString(9, ordem.getDataFechamento() != null ? ordem.getDataFechamento().toString() : null);
+
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    ordem.setId(generatedKeys.getInt(1));
+                }
+            }
+
+            return ordem;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao salvar ordem de serviço no banco de dados.", e);
         }
-        if (clienteId <= 0 || aparelhoId <= 0) {
-            throw new IllegalArgumentException("Cliente e aparelho precisam ser selecionados.");
-        }
-
-        OrdemServico ordem = new OrdemServico(clienteId, aparelhoId, defeitoRelatado);
-        return repository.salvar(ordem);
-    }
-
-    public void concluir(int id, String solucao, double valorServico) {
-        OrdemServico ordem = repository.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Ordem de serviço não encontrada."));
-
-        if (ordem.getStatus() == StatusOrdemServico.CONCLUIDA || ordem.getStatus() == StatusOrdemServico.CANCELADA) {
-            throw new IllegalStateException("Essa ordem já foi finalizada e não pode ser alterada.");
-        }
-        if (ordem.getDiagnostico() == null || ordem.getDiagnostico().isBlank()) {
-            throw new IllegalStateException("Registre o diagnóstico antes de concluir a ordem.");
-        }
-
-        ordem.setSolucao(solucao);
-        ordem.setValorServico(valorServico);
-        ordem.setStatus(StatusOrdemServico.CONCLUIDA);
-        ordem.setDataFechamento(LocalDateTime.now());
-
-        repository.atualizar(ordem);
-    }
-
-    public void cancelar(int id) {
-        OrdemServico ordem = repository.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Ordem de serviço não encontrada."));
-
-        if (ordem.getStatus() == StatusOrdemServico.CONCLUIDA) {
-            throw new IllegalStateException("Não é possível cancelar uma ordem já concluída.");
-        }
-
-        ordem.setStatus(StatusOrdemServico.CANCELADA);
-        ordem.setDataFechamento(LocalDateTime.now());
-        repository.atualizar(ordem);
-    }
-    public void registrarDiagnostico(int id, String diagnostico) {
-        OrdemServico ordem = repository.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Ordem de serviço não encontrada."));
-
-        ordem.setDiagnostico(diagnostico);
-        ordem.setStatus(StatusOrdemServico.EM_ANDAMENTO);
-        repository.atualizar(ordem);
-    }
-
-    public java.util.List<OrdemServico> listarTodas() {
-        return repository.listarTodas();
-    }
-
-    public java.util.List<OrdemServico> listarPorClienteId(int clienteId) {
-        return repository.listarPorClienteId(clienteId);
-    }
-
-    public java.util.Optional<OrdemServico> buscarPorId(int id) {
-        return repository.buscarPorId(id);
     }
 }
