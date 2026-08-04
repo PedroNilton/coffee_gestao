@@ -131,4 +131,64 @@ public class OrdemServicoRepository {
             throw new RuntimeException("Erro ao listar ordens de serviço do cliente.", e);
         }
     }
+    public void atualizar(OrdemServico ordem) {
+        String sql = """
+                UPDATE ordens_servico
+                SET cliente_id = ?, aparelho_id = ?, defeito_relatado = ?, diagnostico = ?,
+                    solucao = ?, status = ?, valor_servico = ?, data_abertura = ?, data_fechamento = ?
+                WHERE id = ?;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ordem.getClienteId());
+            stmt.setInt(2, ordem.getAparelhoId());
+            stmt.setString(3, ordem.getDefeitoRelatado());
+            stmt.setString(4, ordem.getDiagnostico());
+            stmt.setString(5, ordem.getSolucao());
+            stmt.setString(6, ordem.getStatus().name());
+            stmt.setDouble(7, ordem.getValorServico());
+            stmt.setString(8, ordem.getDataAbertura().toString());
+            stmt.setString(9, ordem.getDataFechamento() != null ? ordem.getDataFechamento().toString() : null);
+            stmt.setInt(10, ordem.getId());
+
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao atualizar ordem de serviço.", e);
+        }
+    }
+
+    public void deletar(int id) {
+        String sql = "DELETE FROM ordens_servico WHERE id = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao deletar ordem de serviço.", e);
+        }
+    }
+
+    private OrdemServico mapearOrdemServico(ResultSet rs) throws SQLException {
+        String dataFechamentoStr = rs.getString("data_fechamento");
+
+        return new OrdemServico(
+                rs.getInt("id"),
+                rs.getInt("cliente_id"),
+                rs.getInt("aparelho_id"),
+                rs.getString("defeito_relatado"),
+                rs.getString("diagnostico"),
+                rs.getString("solucao"),
+                StatusOrdemServico.valueOf(rs.getString("status")),
+                rs.getDouble("valor_servico"),
+                LocalDateTime.parse(rs.getString("data_abertura")),
+                dataFechamentoStr != null ? LocalDateTime.parse(dataFechamentoStr) : null
+        );
+    }
+}
 }
