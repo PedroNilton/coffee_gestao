@@ -162,3 +162,78 @@ public class OrdemServicoView extends JFrame {
             comboAparelho.addItem(aparelho);
         }
     }
+
+    private void abrirOrdem() {
+        Cliente cliente = (Cliente) comboCliente.getSelectedItem();
+        Aparelho aparelho = (Aparelho) comboAparelho.getSelectedItem();
+
+        if (cliente == null || aparelho == null) {
+            JOptionPane.showMessageDialog(this, "Selecione cliente e aparelho.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            ordemServicoController.abrir(cliente.getId(), aparelho.getId(), campoDefeitoRelatado.getText());
+            limparFormulario();
+            carregarOrdens();
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Dados inválidos", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao abrir ordem de serviço.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void registrarDiagnostico() {
+        if (idSelecionado == null) {
+            JOptionPane.showMessageDialog(this, "Selecione uma ordem na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            ordemServicoController.registrarDiagnostico(idSelecionado, campoDiagnostico.getText());
+            limparFormulario();
+            carregarOrdens();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void concluirOrdem() {
+        if (idSelecionado == null) {
+            JOptionPane.showMessageDialog(this, "Selecione uma ordem na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            double valor = Double.parseDouble(campoValorServico.getText().replace(",", "."));
+            ordemServicoController.concluir(idSelecionado, campoSolucao.getText(), valor);
+            limparFormulario();
+            carregarOrdens();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Valor do serviço inválido.", "Erro", JOptionPane.WARNING_MESSAGE);
+        } catch (IllegalStateException | IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Não foi possível concluir", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao concluir ordem de serviço.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void cancelarOrdem() {
+        if (idSelecionado == null) {
+            JOptionPane.showMessageDialog(this, "Selecione uma ordem na tabela.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirmacao = JOptionPane.showConfirmDialog(
+                this, "Deseja realmente cancelar essa ordem?", "Confirmar cancelamento", JOptionPane.YES_NO_OPTION);
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            try {
+                ordemServicoController.cancelar(idSelecionado);
+                limparFormulario();
+                carregarOrdens();
+            } catch (IllegalStateException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Não foi possível cancelar", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
