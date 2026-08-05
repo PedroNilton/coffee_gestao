@@ -143,3 +143,22 @@ public class OrdemServicoView extends JFrame {
 
         return painel;
     }
+
+    private void carregarClientesNoCombo() {
+        comboCliente.removeAllItems();
+        List<Cliente> clientes = clienteController.listarTodos();
+        for (Cliente cliente : clientes) {
+            comboCliente.addItem(cliente);
+        }
+    }
+
+    private void carregarAparelhosDoCliente() {
+        comboAparelho.removeAllItems();
+        Cliente clienteSelecionado = (Cliente) comboCliente.getSelectedItem();
+        if (clienteSelecionado == null) return;
+
+        List<Aparelho> aparelhos = aparelhoController.listarPorClienteId(clienteSelecionado.getId());
+        for (Aparelho aparelho : aparelhos) {
+            comboAparelho.addItem(aparelho);
+        }
+    }
