@@ -100,3 +100,22 @@ public class OrdemServicoView extends JFrame {
 
         return painel;
     }
+
+    private JScrollPane criarPainelTabela() {
+        tableModel = new DefaultTableModel(
+                new Object[]{"ID", "Cliente ID", "Aparelho ID", "Status", "Valor"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tabelaOrdens = new JTable(tableModel);
+        tabelaOrdens.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                preencherFormularioComSelecao();
+            }
+        });
+
+        return new JScrollPane(tabelaOrdens);
+    }
