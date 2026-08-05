@@ -19,4 +19,23 @@ public class OrdemServicoController {
     public void registrarDiagnostico(int id, String diagnostico) {
         service.registrarDiagnostico(id, diagnostico);
     }
+    public void concluir(int id, String solucao, double valorServico) {
+        service.concluir(id, solucao, valorServico);
+    }
+
+    public void cancelar(int id) {
+        service.cancelar(id);
+    }
+
+    public java.util.List<OrdemServico> listarTodas() {
+        return service.listarTodas();
+    }
+
+    public java.util.List<OrdemServico> listarPorClienteId(int clienteId) {
+        return service.listarPorClienteId(clienteId);
+    }
+
+    public java.util.Optional<OrdemServico> buscarPorId(int id) {
+        return service.buscarPorId(id);
+    }
 }
