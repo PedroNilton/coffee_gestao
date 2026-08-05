@@ -57,4 +57,26 @@ public class OrdemServicoService {
         ordem.setDataFechamento(LocalDateTime.now());
         repository.atualizar(ordem);
     }
+
+    public void registrarDiagnostico(int id, String diagnostico) {
+        OrdemServico ordem = repository.buscarPorId(id)
+                .orElseThrow(() -> new IllegalArgumentException("Ordem de serviço não encontrada."));
+
+        ordem.setDiagnostico(diagnostico);
+        ordem.setStatus(StatusOrdemServico.EM_ANDAMENTO);
+        repository.atualizar(ordem);
+    }
+
+    public java.util.List<OrdemServico> listarTodas() {
+        return repository.listarTodas();
+    }
+
+    public java.util.List<OrdemServico> listarPorClienteId(int clienteId) {
+        return repository.listarPorClienteId(clienteId);
+    }
+
+    public java.util.Optional<OrdemServico> buscarPorId(int id) {
+        return repository.buscarPorId(id);
+    }
+}
 }
