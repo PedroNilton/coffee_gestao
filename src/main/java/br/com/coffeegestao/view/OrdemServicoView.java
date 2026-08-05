@@ -1,4 +1,102 @@
 package br.com.coffeegestao.view;
 
-public class OrdemServicoView {
-}
+import br.com.coffeegestao.controller.AparelhoController;
+import br.com.coffeegestao.controller.ClienteController;
+import br.com.coffeegestao.controller.OrdemServicoController;
+import br.com.coffeegestao.model.Aparelho;
+import br.com.coffeegestao.model.Cliente;
+import br.com.coffeegestao.model.OrdemServico;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
+
+public class OrdemServicoView extends JFrame {
+
+    private final OrdemServicoController ordemServicoController;
+    private final ClienteController clienteController;
+    private final AparelhoController aparelhoController;
+
+    private JComboBox<Cliente> comboCliente;
+    private JComboBox<Aparelho> comboAparelho;
+    private JTextArea campoDefeitoRelatado;
+    private JTextArea campoDiagnostico;
+    private JTextArea campoSolucao;
+    private JTextField campoValorServico;
+
+    private JTable tabelaOrdens;
+    private DefaultTableModel tableModel;
+
+    private Integer idSelecionado;
+
+    public OrdemServicoView() {
+        this.ordemServicoController = new OrdemServicoController();
+        this.clienteController = new ClienteController();
+        this.aparelhoController = new AparelhoController();
+
+        setTitle("Ordens de Serviço - Coffee Gestão");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
+
+        add(criarPainelFormulario(), BorderLayout.NORTH);
+        add(criarPainelTabela(), BorderLayout.CENTER);
+        add(criarPainelBotoes(), BorderLayout.SOUTH);
+
+        carregarOrdens();
+    }
+
+    private JPanel criarPainelFormulario() {
+        JPanel painel = new JPanel(new GridLayout(6, 2, 5, 5));
+        painel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        comboCliente = new JComboBox<>();
+        comboCliente.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Cliente cliente) {
+                    setText(cliente.getNome());
+                }
+                return this;
+            }
+        });
+        comboCliente.addActionListener(e -> carregarAparelhosDoCliente());
+        carregarClientesNoCombo();
+
+        comboAparelho = new JComboBox<>();
+        comboAparelho.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Aparelho aparelho) {
+                    setText(aparelho.getTipo() + " " + aparelho.getModelo());
+                }
+                return this;
+            }
+        });
+
+        campoDefeitoRelatado = new JTextArea(2, 20);
+        campoDiagnostico = new JTextArea(2, 20);
+        campoSolucao = new JTextArea(2, 20);
+        campoValorServico = new JTextField();
+
+        painel.add(new JLabel("Cliente:"));
+        painel.add(comboCliente);
+        painel.add(new JLabel("Aparelho:"));
+        painel.add(comboAparelho);
+        painel.add(new JLabel("Defeito relatado:"));
+        painel.add(new JScrollPane(campoDefeitoRelatado));
+        painel.add(new JLabel("Diagnóstico:"));
+        painel.add(new JScrollPane(campoDiagnostico));
+        painel.add(new JLabel("Solução:"));
+        painel.add(new JScrollPane(campoSolucao));
+        painel.add(new JLabel("Valor do serviço:"));
+        painel.add(campoValorServico);
+
+        return painel;
+    }
