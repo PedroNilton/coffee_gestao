@@ -119,3 +119,27 @@ public class OrdemServicoView extends JFrame {
 
         return new JScrollPane(tabelaOrdens);
     }
+
+    private JPanel criarPainelBotoes() {
+        JPanel painel = new JPanel(new FlowLayout());
+
+        JButton btnAbrir = new JButton("Abrir Ordem");
+        JButton btnDiagnosticar = new JButton("Registrar Diagnóstico");
+        JButton btnConcluir = new JButton("Concluir");
+        JButton btnCancelar = new JButton("Cancelar");
+        JButton btnLimpar = new JButton("Limpar");
+
+        btnAbrir.addActionListener(e -> abrirOrdem());
+        btnDiagnosticar.addActionListener(e -> registrarDiagnostico());
+        btnConcluir.addActionListener(e -> concluirOrdem());
+        btnCancelar.addActionListener(e -> cancelarOrdem());
+        btnLimpar.addActionListener(e -> limparFormulario());
+
+        painel.add(btnAbrir);
+        painel.add(btnDiagnosticar);
+        painel.add(btnConcluir);
+        painel.add(btnCancelar);
+        painel.add(btnLimpar);
+
+        return painel;
+    }
