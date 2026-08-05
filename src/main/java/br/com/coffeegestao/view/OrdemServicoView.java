@@ -237,3 +237,33 @@ public class OrdemServicoView extends JFrame {
             }
         }
     }
+
+    private void preencherFormularioComSelecao() {
+        int linha = tabelaOrdens.getSelectedRow();
+        if (linha == -1) return;
+
+        idSelecionado = (Integer) tableModel.getValueAt(linha, 0);
+    }
+
+    private void limparFormulario() {
+        idSelecionado = null;
+        campoDefeitoRelatado.setText("");
+        campoDiagnostico.setText("");
+        campoSolucao.setText("");
+        campoValorServico.setText("");
+        tabelaOrdens.clearSelection();
+        if (comboCliente.getItemCount() > 0) comboCliente.setSelectedIndex(0);
+    }
+
+    private void carregarOrdens() {
+        tableModel.setRowCount(0);
+
+        List<OrdemServico> ordens = ordemServicoController.listarTodas();
+        for (OrdemServico ordem : ordens) {
+            tableModel.addRow(new Object[]{
+                    ordem.getId(), ordem.getClienteId(), ordem.getAparelhoId(),
+                    ordem.getStatus(), ordem.getValorServico()
+            });
+        }
+    }
+}
