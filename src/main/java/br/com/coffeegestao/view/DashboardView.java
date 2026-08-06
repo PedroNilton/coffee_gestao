@@ -33,3 +33,22 @@ public class DashboardView extends JFrame {
         painel.add(label);
         return painel;
     }
+
+    private JPanel criarPainelMenu() {
+        JPanel painel = new JPanel(new GridLayout(3, 1, 10, 10));
+        painel.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
+
+        JButton btnClientes = new JButton("Clientes");
+        JButton btnAparelhos = new JButton("Aparelhos");
+        JButton btnOrdensServico = new JButton("Ordens de Serviço");
+
+        btnClientes.addActionListener(e -> new ClienteView().setVisible(true));
+        btnAparelhos.addActionListener(e -> new AparelhoView().setVisible(true));
+        btnOrdensServico.addActionListener(e -> new OrdemServicoView().setVisible(true));
+
+        painel.add(btnClientes);
+        painel.add(btnAparelhos);
+        painel.add(btnOrdensServico);
+
+        return painel;
+    }
