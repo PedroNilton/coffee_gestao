@@ -40,3 +40,13 @@ public class LoginView extends JFrame {
 
         return painel;
     }
+
+    private JPanel criarPainelBotao() {
+        JPanel painel = new JPanel(new FlowLayout());
+
+        JButton btnEntrar = new JButton("Entrar");
+        btnEntrar.addActionListener(e -> autenticar());
+
+        painel.add(btnEntrar);
+        return painel;
+    }
