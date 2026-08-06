@@ -50,3 +50,20 @@ public class LoginView extends JFrame {
         painel.add(btnEntrar);
         return painel;
     }
+
+    private void autenticar() {
+        String email = campoEmail.getText();
+        String senha = new String(campoSenha.getPassword());
+
+        try {
+            Usuario usuario = loginController.login(email, senha);
+            dispose();
+            new DashboardView(usuario).setVisible(true);
+
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erro de login", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao autenticar.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
