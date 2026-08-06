@@ -52,3 +52,17 @@ public class DashboardView extends JFrame {
 
         return painel;
     }
+
+    private JPanel criarPainelSair() {
+        JPanel painel = new JPanel(new FlowLayout());
+
+        JButton btnSair = new JButton("Sair");
+        btnSair.addActionListener(e -> {
+            dispose();
+            new LoginView().setVisible(true);
+        });
+
+        painel.add(btnSair);
+        return painel;
+    }
+}
