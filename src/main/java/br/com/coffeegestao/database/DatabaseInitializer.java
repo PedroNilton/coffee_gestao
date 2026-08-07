@@ -58,6 +58,16 @@ public class DatabaseInitializer {
                 );
                 """;
 
+        String sqlProdutos = """
+                CREATE TABLE IF NOT EXISTS produtos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nome TEXT NOT NULL,
+                    descricao TEXT,
+                    preco REAL NOT NULL DEFAULT 0,
+                    quantidade_estoque INTEGER NOT NULL DEFAULT 0
+                );
+                """;
+
         try (Connection conn = ConnectionFactory.getConnection();
              Statement stmt = conn.createStatement()) {
 
@@ -65,6 +75,7 @@ public class DatabaseInitializer {
             stmt.execute(sqlClientes);
             stmt.execute(sqlAparelhos);
             stmt.execute(sqlOrdens);
+            stmt.execute(sqlProdutos);
 
             System.out.println("Banco inicializado com sucesso.");
 
