@@ -92,4 +92,41 @@ public class ProdutoRepository {
             throw new RuntimeException("Erro ao listar produtos.", e);
         }
     }
+
+    public void atualizar(Produto produto) {
+        String sql = """
+                UPDATE produtos
+                SET nome = ?, descricao = ?, preco = ?, quantidade_estoque = ?
+                WHERE id = ?;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, produto.getNome());
+            stmt.setString(2, produto.getDescricao());
+            stmt.setDouble(3, produto.getPreco());
+            stmt.setInt(4, produto.getQuantidadeEstoque());
+            stmt.setInt(5, produto.getId());
+
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao atualizar produto.", e);
+        }
+    }
+
+    public void deletar(int id) {
+        String sql = "DELETE FROM produtos WHERE id = ?;";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao deletar produto.", e);
+        }
+    }
 }
