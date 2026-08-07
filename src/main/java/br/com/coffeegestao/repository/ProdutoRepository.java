@@ -42,4 +42,54 @@ public class ProdutoRepository {
             throw new RuntimeException("Erro ao salvar produto no banco de dados.", e);
         }
     }
+
+    public Optional<Produto> buscarPorId(int id) {
+        String sql = """
+                SELECT id, nome, descricao, preco, quantidade_estoque
+                FROM produtos
+                WHERE id = ?
+                LIMIT 1;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapearProduto(rs));
+                }
+            }
+
+            return Optional.empty();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar produto por id.", e);
+        }
+    }
+
+    public List<Produto> listarTodos() {
+        String sql = """
+                SELECT id, nome, descricao, preco, quantidade_estoque
+                FROM produtos
+                ORDER BY nome;
+                """;
+
+        List<Produto> produtos = new ArrayList<>();
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                produtos.add(mapearProduto(rs));
+            }
+
+            return produtos;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao listar produtos.", e);
+        }
+    }
 }
