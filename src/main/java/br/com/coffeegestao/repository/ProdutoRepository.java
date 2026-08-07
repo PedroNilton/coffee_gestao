@@ -129,4 +129,40 @@ public class ProdutoRepository {
             throw new RuntimeException("Erro ao deletar produto.", e);
         }
     }
+
+    public void baixarEstoque(int id, int quantidade) {
+        String sql = """
+                UPDATE produtos
+                SET quantidade_estoque = quantidade_estoque - ?
+                WHERE id = ? AND quantidade_estoque >= ?;
+                """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, quantidade);
+            stmt.setInt(2, id);
+            stmt.setInt(3, quantidade);
+
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas == 0) {
+                throw new IllegalStateException("Estoque insuficiente para o produto informado.");
+            }
+
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao baixar estoque do produto.", e);
+        }
+    }
+
+    private Produto mapearProduto(ResultSet rs) throws SQLException {
+        return new Produto(
+                rs.getInt("id"),
+                rs.getString("nome"),
+                rs.getString("descricao"),
+                rs.getDouble("preco"),
+                rs.getInt("quantidade_estoque")
+        );
+    }
 }
