@@ -19,9 +19,17 @@ public class Main {
         UsuarioRepository usuarioRepository = new UsuarioRepository();
 
         if (!usuarioRepository.existeAdmin()) {
-            Usuario admin = new Usuario("Administrador", "admin@coffeegestao.com", "admin123", "ADMIN", true);
+            String email = System.getenv().getOrDefault("ADMIN_EMAIL", "admin@coffeegestao.com");
+            String senha = System.getenv("ADMIN_PASSWORD");
+
+            if (senha == null || senha.isBlank()) {
+                System.out.println("Nenhum admin encontrado. Defina a variável de ambiente ADMIN_PASSWORD e rode novamente para criar o usuário administrador.");
+                return;
+            }
+
+            Usuario admin = new Usuario("Administrador", email, senha, "ADMIN", true);
             usuarioRepository.salvar(admin);
-            System.out.println("Usuário admin criado: admin@coffeegestao.com / admin123");
+            System.out.println("Usuário admin criado: " + email);
         }
     }
 }
