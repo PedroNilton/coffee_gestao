@@ -34,4 +34,24 @@ public class ProdutoService {
         }
         produtoRepository.baixarEstoque(id, quantidade);
     }
+
+    public Optional<Produto> buscarPorId(int id) {
+        return produtoRepository.buscarPorId(id);
+    }
+
+    public List<Produto> listarTodos() {
+        return produtoRepository.listarTodos();
+    }
+
+    private void validar(Produto produto) {
+        if (produto.getNome() == null || produto.getNome().isBlank()) {
+            throw new IllegalArgumentException("Nome do produto é obrigatório.");
+        }
+        if (produto.getPreco() < 0) {
+            throw new IllegalArgumentException("Preço não pode ser negativo.");
+        }
+        if (produto.getQuantidadeEstoque() < 0) {
+            throw new IllegalArgumentException("Quantidade em estoque não pode ser negativa.");
+        }
+    }
 }
